@@ -1,0 +1,11 @@
+#!/bin/bash
+
+class=$(hyprctl -j activewindow | jq .address)
+
+function samegroup_windows() {
+    hyprctl -j clients | jq '.[] | select(.class=="kitty")'
+}
+
+for window in samegroup_windows(); do
+    echo $window
+done
