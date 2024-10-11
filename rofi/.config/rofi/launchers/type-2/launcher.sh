@@ -17,4 +17,5 @@ theme='style-2'
 ## Run
 rofi \
     -show drun \
+    -modes "window,drun,calc" \
     -theme ${dir}/${theme}.rasi
