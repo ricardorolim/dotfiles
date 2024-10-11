@@ -14,6 +14,9 @@ unsetopt beep
 bindkey -e
 # End of lines configured by zsh-newuser-install
 
+# Remove / to allow removing single directories from path
+export WORDCHARS="*?_-.[]~=&;!#$%^(){}<>"
+
 # The following lines were added by compinstall
 zstyle :compinstall filename '/home/rickroll/.zshrc'
 
