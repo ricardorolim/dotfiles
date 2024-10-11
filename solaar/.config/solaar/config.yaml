@@ -27,6 +27,7 @@
     adc_power_management]
   _battery: 4096
   _modelId: B01D406F0000
+  _sensitive: {hires-scroll-mode: ignore, hires-smooth-invert: ignore, hires-smooth-resolution: ignore}
   _unitId: B7D0B233
   change-host: null
   divert-keys: {82: 0, 83: 0, 86: 0, 91: 0, 93: 0, 237: 0}
