@@ -167,6 +167,14 @@ vim.keymap.set('n', ']d', vim.diagnostic.goto_next, { desc = 'Go to next [D]iagn
 vim.keymap.set('n', '<leader>e', vim.diagnostic.open_float, { desc = 'Show diagnostic [E]rror messages' })
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setloclist, { desc = 'Open diagnostic [Q]uickfix list' })
 
+-- Quicklink keymaps
+vim.keymap.set('n', '[q', vim.cmd.cprevious, { desc = 'Display the previous error in the quickfix list' })
+vim.keymap.set('n', ']q', vim.cmd.cnext, { desc = 'Display the next error in the quickfix list' })
+
+-- Move lines
+vim.keymap.set('v', '<C-Up>', ":m '<-2<CR>gv=gv", { desc = 'Move line up' })
+vim.keymap.set('v', '<C-Down>', ":m '>+1<CR>gv=gv", { desc = 'Move line down' })
+
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
 -- is not what someone will guess without a bit more experience.
@@ -187,8 +195,8 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  See `:help wincmd` for a list of all window commands
 vim.keymap.set('n', '<C-Left>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-Right>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
-vim.keymap.set('n', '<C-Down>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
-vim.keymap.set('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+-- vim.keymap.set('n', '<C-Down>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+-- vim.keymap.set('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -452,17 +460,24 @@ require('lazy').setup({
       -- Telescope picker. This is really useful to discover what Telescope can
       -- do as well as how to actually do it!
 
+      -- trouble
+      -- local open_with_trouble = require('trouble.sources.telescope').open
+
       -- [[ Configure Telescope ]]
       -- See `:help telescope` and `:help telescope.setup()`
       require('telescope').setup {
         -- You can put your default mappings / updates / etc. in here
         --  All the info you're looking for is in `:help telescope.setup()`
         --
-        -- defaults = {
-        --   mappings = {
-        --     i = { ['<c-enter>'] = 'to_fuzzy_refine' },
-        --   },
-        -- },
+        defaults = {
+          mappings = {
+            i = {
+              ['<c-enter>'] = 'to_fuzzy_refine',
+              -- ['<c-t>'] = open_with_trouble,
+            },
+            -- n = { ['<c-t>'] = open_with_trouble },
+          },
+        },
         -- pickers = {}
         extensions = {
           ['ui-select'] = {
@@ -817,12 +832,12 @@ require('lazy').setup({
           -- `friendly-snippets` contains a variety of premade snippets.
           --    See the README about individual language/framework/plugin snippets:
           --    https://github.com/rafamadriz/friendly-snippets
-          -- {
-          --   'rafamadriz/friendly-snippets',
-          --   config = function()
-          --     require('luasnip.loaders.from_vscode').lazy_load()
-          --   end,
-          -- },
+          {
+            'rafamadriz/friendly-snippets',
+            config = function()
+              require('luasnip.loaders.from_vscode').lazy_load()
+            end,
+          },
         },
       },
       'saadparwaiz1/cmp_luasnip',
@@ -1060,27 +1075,35 @@ require('lazy').setup({
             [']s'] = { query = '@scope', query_group = 'locals', desc = 'Next scope' },
             [']z'] = { query = '@fold', query_group = 'folds', desc = 'Next fold' },
             [']p'] = '@parameter.inner',
+            [']=r'] = '@assignment.rhs',
+            [']i'] = '@conditional.outer',
           },
           goto_next_end = {
             [']M'] = '@function.outer',
             [']['] = '@class.outer',
+            [']=L'] = '@assignment.lhs',
+            [']I'] = '@conditional.outer',
           },
           goto_previous_start = {
             ['[m'] = '@function.outer',
             ['[['] = '@class.outer',
+            ['[=r'] = '@assignment.rhs',
+            ['[i'] = '@conditional.outer',
           },
           goto_previous_end = {
             ['[M'] = '@function.outer',
             ['[]'] = '@class.outer',
+            ['[=L'] = '@assignment.lhs',
+            ['[I'] = '@conditional.outer',
           },
           -- Below will go to either the start or the end, whichever is closer.
           -- Use if you want more granular movements
           -- Make it even more gradual by adding multiple queries and regex.
           goto_next = {
-            [']i'] = '@conditional.outer',
+            -- [']i'] = '@conditional.outer',
           },
           goto_previous = {
-            ['[i'] = '@conditional.outer',
+            -- ['[i'] = '@conditional.outer',
           },
         },
         lsp_interop = {
@@ -1094,6 +1117,7 @@ require('lazy').setup({
         },
       },
     },
+
     config = function(_, opts)
       -- [[ Configure Treesitter ]] See `:help nvim-treesitter`
 
