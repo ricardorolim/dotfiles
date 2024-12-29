@@ -172,8 +172,8 @@ vim.keymap.set('n', '[q', vim.cmd.cprevious, { desc = 'Display the previous erro
 vim.keymap.set('n', ']q', vim.cmd.cnext, { desc = 'Display the next error in the quickfix list' })
 
 -- Move lines
-vim.keymap.set('v', '<C-Up>', ":m '<-2<CR>gv=gv", { desc = 'Move line up' })
-vim.keymap.set('v', '<C-Down>', ":m '>+1<CR>gv=gv", { desc = 'Move line down' })
+vim.keymap.set('v', '<M-Up>', ":m '<-2<CR>gv=gv", { desc = 'Move line up' })
+vim.keymap.set('v', '<M-Down>', ":m '>+1<CR>gv=gv", { desc = 'Move line down' })
 
 -- Exit terminal mode in the builtin terminal with a shortcut that is a bit easier
 -- for people to discover. Otherwise, you normally need to press <C-\><C-n>, which
@@ -195,8 +195,15 @@ vim.keymap.set('t', '<Esc><Esc>', '<C-\\><C-n>', { desc = 'Exit terminal mode' }
 --  See `:help wincmd` for a list of all window commands
 vim.keymap.set('n', '<C-Left>', '<C-w><C-h>', { desc = 'Move focus to the left window' })
 vim.keymap.set('n', '<C-Right>', '<C-w><C-l>', { desc = 'Move focus to the right window' })
--- vim.keymap.set('n', '<C-Down>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
--- vim.keymap.set('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+vim.keymap.set('n', '<C-Down>', '<C-w><C-j>', { desc = 'Move focus to the lower window' })
+vim.keymap.set('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
+
+-- Insert newline without entering insert mode
+vim.keymap.set('n', 'gO', 'O<Esc>j', { desc = 'Insert newline above without entering insert mode' })
+vim.keymap.set('n', 'go', 'o<Esc>k', { desc = 'Insert newline below without entering insert mode' })
+
+vim.keymap.set('n', '<leader>x', ':.lua<CR>')
+vim.keymap.set('v', '<leader>x', ':lua<CR>')
 
 -- [[ Basic Autocommands ]]
 --  See `:help lua-guide-autocommands`
@@ -223,10 +230,21 @@ vim.api.nvim_create_autocmd('FileType', {
 })
 
 vim.api.nvim_create_autocmd('FileType', {
-  pattern = { '*.js', '*.cjs', '*.mjs' },
+  pattern = { '*.js', '*.cjs', '*.mjs', 'typescript', 'typescriptreact' },
   group = vim.api.nvim_create_augroup('javascript-settings', { clear = true }),
   callback = function()
+    vim.opt.tabstop = 2
+    vim.opt.shiftwidth = 2
+    vim.opt.list = false
+  end,
+})
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = { 'java', 'pom.xml' },
+  group = vim.api.nvim_create_augroup('java-settings', { clear = true }),
+  callback = function()
     vim.opt.tabstop = 4
+    vim.opt.list = false
   end,
 })
 
@@ -290,13 +308,16 @@ require('lazy').setup({
           vim.keymap.set(mode, l, r, opts)
         end
 
+        local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
+        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(gs.next_hunk, gs.prev_hunk)
+
         -- Navigation
         map('n', ']c', function()
           if vim.wo.diff then
             return ']c'
           end
           vim.schedule(function()
-            gs.next_hunk()
+            next_hunk_repeat()
           end)
           return '<Ignore>'
         end, { expr = true })
@@ -306,7 +327,7 @@ require('lazy').setup({
             return '[c'
           end
           vim.schedule(function()
-            gs.prev_hunk()
+            prev_hunk_repeat()
           end)
           return '<Ignore>'
         end, { expr = true })
@@ -477,6 +498,8 @@ require('lazy').setup({
             },
             -- n = { ['<c-t>'] = open_with_trouble },
           },
+
+          -- path_display = 'tail',
         },
         -- pickers = {}
         extensions = {
@@ -706,6 +729,8 @@ require('lazy').setup({
         gopls = {},
         pyright = {},
         rust_analyzer = {},
+        jdtls = {},
+        ts_ls = {},
         -- ... etc. See `:help lspconfig-all` for a list of all the pre-configured LSPs
         --
         -- Some languages (like typescript) have entire language plugins that can be useful:
@@ -745,6 +770,8 @@ require('lazy').setup({
       vim.list_extend(ensure_installed, {
         'stylua', -- Used to format Lua code
         'prettierd',
+        'java-debug-adapter',
+        'java-test',
       })
       require('mason-tool-installer').setup { ensure_installed = ensure_installed }
 
@@ -784,7 +811,7 @@ require('lazy').setup({
         -- Disable "format_on_save lsp_fallback" for languages that don't
         -- have a well standardized coding style. You can add additional
         -- languages here or re-enable it for the disabled ones.
-        local disable_filetypes = { c = true, cpp = true }
+        local disable_filetypes = { c = true, cpp = true, java = true }
         local lsp_format_opt
         if disable_filetypes[vim.bo[bufnr].filetype] then
           lsp_format_opt = 'never'
@@ -803,10 +830,11 @@ require('lazy').setup({
         --
         -- You can use 'stop_after_first' to run the first available formatter from the list
         javascript = { 'prettierd', 'prettier', stop_after_first = true },
+        typescript = { 'prettierd', 'prettier', stop_after_first = true },
       },
       formatters = {
         prettierd = {
-          prepend_args = { '--tab-width=4' },
+          -- prepend_args = { '--tab-width=4' },
         },
       },
     },
@@ -953,7 +981,18 @@ require('lazy').setup({
       --  - va)  - [V]isually select [A]round [)]paren
       --  - yinq - [Y]ank [I]nside [N]ext [']quote
       --  - ci'  - [C]hange [I]nside [']quote
-      require('mini.ai').setup { n_lines = 500 }
+      require('mini.ai').setup {
+        n_lines = 500,
+        -- mappings = {
+        --   goto_left = 'g[',
+        --   goto_right = 'g]',
+        -- },
+        custom_textobjects = {
+          -- Disable function text object in favor of Tresitter's
+          -- TODO: enable it for plain text buffers
+          f = '',
+        },
+      }
 
       -- Add/delete/replace surroundings (brackets, quotes, etc.)
       --
@@ -986,7 +1025,7 @@ require('lazy').setup({
     build = ':TSUpdate',
     dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
     opts = {
-      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc' },
+      ensure_installed = { 'bash', 'c', 'diff', 'html', 'lua', 'luadoc', 'markdown', 'vim', 'vimdoc', 'java' },
       -- Autoinstall languages that are not installed
       auto_install = true,
       highlight = {
@@ -1000,10 +1039,10 @@ require('lazy').setup({
       incremental_selection = {
         enable = true,
         keymaps = {
-          init_selection = 'gnn',
-          node_incremental = 'grn',
-          scope_incremental = 'grc',
-          node_decremental = 'grm',
+          init_selection = 'gn',
+          node_incremental = 'gu',
+          scope_incremental = 'gi',
+          node_decremental = 'ge',
         },
       },
       textobjects = {
@@ -1048,7 +1087,7 @@ require('lazy').setup({
           -- * query_string: eg '@function.inner'
           -- * selection_mode: eg 'v'
           -- and should return true or false
-          include_surrounding_whitespace = false,
+          include_surrounding_whitespace = true,
         },
         swap = {
           enable = true,
@@ -1063,7 +1102,7 @@ require('lazy').setup({
           enable = true,
           set_jumps = true, -- whether to set jumps in the jumplist
           goto_next_start = {
-            [']m'] = '@function.outer',
+            [']f'] = '@function.outer',
             [']]'] = { query = '@class.outer', desc = 'Next class start' },
             --
             -- You can use regex matching (i.e. lua pattern) and/or pass a list in a "query" key to group multiple queires.
@@ -1075,25 +1114,32 @@ require('lazy').setup({
             [']s'] = { query = '@scope', query_group = 'locals', desc = 'Next scope' },
             [']z'] = { query = '@fold', query_group = 'folds', desc = 'Next fold' },
             [']p'] = '@parameter.inner',
-            [']=r'] = '@assignment.rhs',
+            [']r'] = '@assignment.rhs',
+            [']l'] = '@assignment.lhs',
             [']i'] = '@conditional.outer',
           },
           goto_next_end = {
-            [']M'] = '@function.outer',
+            [']F'] = '@function.outer',
             [']['] = '@class.outer',
-            [']=L'] = '@assignment.lhs',
+            [']P'] = '@parameter.inner',
+            [']R'] = '@assignment.rhs',
+            [']L'] = '@assignment.lhs',
             [']I'] = '@conditional.outer',
           },
           goto_previous_start = {
-            ['[m'] = '@function.outer',
+            ['[f'] = '@function.outer',
             ['[['] = '@class.outer',
-            ['[=r'] = '@assignment.rhs',
+            ['[p'] = '@parameter.inner',
+            ['[r'] = '@assignment.rhs',
+            ['[l'] = '@assignment.lhs',
             ['[i'] = '@conditional.outer',
           },
           goto_previous_end = {
-            ['[M'] = '@function.outer',
+            ['[f'] = '@function.outer',
             ['[]'] = '@class.outer',
-            ['[=L'] = '@assignment.lhs',
+            ['[P'] = '@parameter.inner',
+            ['[R'] = '@assignment.rhs',
+            ['[L'] = '@assignment.lhs',
             ['[I'] = '@conditional.outer',
           },
           -- Below will go to either the start or the end, whichever is closer.
@@ -1161,7 +1207,7 @@ require('lazy').setup({
   --  Here are some example plugins that I've included in the Kickstart repository.
   --  Uncomment any of the lines below to enable them (you will need to restart nvim).
   --
-  -- require 'kickstart.plugins.debug',
+  require 'kickstart.plugins.debug',
   -- require 'kickstart.plugins.indent_line',
   -- require 'kickstart.plugins.lint',
   -- require 'kickstart.plugins.autopairs',
