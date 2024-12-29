@@ -20,14 +20,21 @@ export WORDCHARS="*?_-.[]~=&;!#$%^(){}<>"
 # The following lines were added by compinstall
 zstyle :compinstall filename '/home/rickroll/.zshrc'
 
-autoload -Uz compinit
-compinit
+# autoload -Uz compinit
+# compinit
 # End of lines added by compinstall
+
+# Edit command line
+EDITOR=nvim
+autoload -z edit-command-line
+zle -N edit-command-line
+bindkey "^X^E" edit-command-line
 
 # Aliases
 alias ll='ls -l --color'
 alias la='ll -a'
 alias vim='nvim'
+alias grep='grep --color'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
@@ -36,6 +43,7 @@ source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
 # ZSH Plugins
 source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
 source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+# source /usr/share/zsh/plugins/zsh-autocomplete/zsh-autocomplete.plugin.zsh
 
 # FZF
 source /usr/share/fzf/key-bindings.zsh
@@ -43,3 +51,6 @@ source /usr/share/fzf/completion.zsh
 
 # Rust
 source ~/.cargo/env
+
+# Created by `pipx` on 2024-10-22 08:49:32
+export PATH="$PATH:/home/rickroll/.local/bin"
