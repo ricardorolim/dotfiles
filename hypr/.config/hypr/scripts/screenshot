@@ -9,7 +9,7 @@ iDIR="$HOME/.config/hypr/mako/icons"
 # time=`date +%Y%m%d_%Hh%Mm%Ss`
 time=`date +%F_%T`
 # dir="`xdg-user-dir PICTURES`/Screenshots"
-dir=~/Downloads/screenshots
+dir=~/downloads/screenshots
 file="screenshot_${time}.png"
 
 # notify and view screenshot
