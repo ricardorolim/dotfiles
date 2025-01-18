@@ -11,11 +11,14 @@ return {
     { '<leader>ft', '<cmd>Neotree toggle<cr>', desc = 'NeoTree' },
     { '<leader>fr', '<cmd>Neotree reveal<cr>', desc = 'NeoTree' },
   },
-  config = function()
-    require('neo-tree').setup {
-      buffers = {
-        follow_current_file = { enabled = true },
+  opts = {
+    buffers = {
+      follow_current_file = { enabled = true },
+    },
+    window = {
+      mappings = {
+        ['Z'] = 'expand_all_nodes',
       },
-    }
-  end,
+    },
+  },
 }

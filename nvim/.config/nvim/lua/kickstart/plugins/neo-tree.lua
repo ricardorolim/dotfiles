@@ -1,5 +1,7 @@
 -- Neo-tree is a Neovim plugin to browse the file system
 -- https://github.com/nvim-neo-tree/neo-tree.nvim
+-- This is currently deactivated. It needs to be activated from init.lua.
+-- filetree.lua is the active neo-tree configuration.
 
 return {
   'nvim-neo-tree/neo-tree.nvim',
