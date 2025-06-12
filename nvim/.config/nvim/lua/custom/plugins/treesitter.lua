@@ -154,8 +154,8 @@ return { -- Highlight, edit, and navigate code
 
     -- Repeat movement with ; and ,
     -- ensure ; goes forward and , goes backward regardless of the last direction
-    vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_next)
-    vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_previous)
+    vim.keymap.set({ 'n', 'x', 'o' }, ',', ts_repeat_move.repeat_last_move_next)
+    vim.keymap.set({ 'n', 'x', 'o' }, ';', ts_repeat_move.repeat_last_move_previous)
 
     -- vim way: ; goes to the direction you were moving.
     -- vim.keymap.set({ "n", "x", "o" }, ";", ts_repeat_move.repeat_last_move)
