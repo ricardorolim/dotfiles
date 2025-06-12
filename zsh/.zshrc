@@ -35,6 +35,8 @@ alias ll='ls -l --color'
 alias la='ll -a'
 alias vim='nvim'
 alias grep='grep --color'
+# alias simkit='/home/rickroll/simscale/dataflows/backend/tools/simkit/build/install/simkit/bin/simkit'
+alias simkit='/home/rickroll/simscale/dataflows-split/dataflow-tools/simkit-cli/build/install/simkit/bin/simkit'
 
 # To customize prompt, run `p10k configure` or edit ~/.p10k.zsh.
 source /usr/share/zsh-theme-powerlevel10k/powerlevel10k.zsh-theme
@@ -54,3 +56,8 @@ source ~/.cargo/env
 
 # Created by `pipx` on 2024-10-22 08:49:32
 export PATH="$PATH:/home/rickroll/.local/bin"
+
+# Pyenv
+# export PYENV_ROOT="$HOME/.pyenv"
+# [[ -d $PYENV_ROOT/bin ]] && export PATH="$PYENV_ROOT/bin:$PATH"
+# eval "$(pyenv init - zsh)"
