@@ -34,8 +34,8 @@ return { -- Highlight, edit, and navigate code
           -- You can use the capture groups defined in textobjects.scm
           ['aa'] = { query = '@parameter.outer', desc = 'Select outer parameter' },
           ['ia'] = { query = '@parameter.inner', desc = 'Select inner parameter' },
-          ['af'] = { query = '@function.outer', desc = 'Select outer function' },
-          ['if'] = { query = '@function.inner', desc = 'Select inner function' },
+          ['am'] = { query = '@function.outer', desc = 'Select outer function' },
+          ['im'] = { query = '@function.inner', desc = 'Select inner function' },
           ['ac'] = { query = '@class.outer', desc = 'Select outer part of a class region' },
           ['ic'] = { query = '@class.inner', desc = 'Select inner part of a class region' },
           ['ai'] = { query = '@conditional.outer', desc = 'Select outer part of a conditional region' },
@@ -113,7 +113,7 @@ return { -- Highlight, edit, and navigate code
           ['[i'] = '@conditional.outer',
         },
         goto_previous_end = {
-          ['[f'] = '@function.outer',
+          ['[F'] = '@function.outer',
           ['[]'] = '@class.outer',
           ['[P'] = '@parameter.inner',
           ['[R'] = '@assignment.rhs',
