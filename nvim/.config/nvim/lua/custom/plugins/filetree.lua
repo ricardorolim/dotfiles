@@ -11,14 +11,31 @@ return {
     { '<leader>ft', '<cmd>Neotree toggle<cr>', desc = 'NeoTree' },
     { '<leader>fr', '<cmd>Neotree reveal<cr>', desc = 'NeoTree' },
   },
-  opts = {
-    buffers = {
-      follow_current_file = { enabled = true },
-    },
-    window = {
-      mappings = {
-        ['Z'] = 'expand_all_nodes',
+  opts = function(_, opts)
+    -- local api = require 'pymple.api'
+    -- local config = require 'pymple.config'
+    --
+    -- local function on_move(args)
+    --   api.update_imports(args.source, args.destination, config.user_config.update_imports)
+    -- end
+    --
+    -- local events = require 'neo-tree.events'
+    -- opts.event_handlers = opts.event_handlers or {}
+    -- vim.list_extend(opts.event_handlers, {
+    --   { event = events.FILE_MOVED, handler = on_move },
+    --   { event = events.FILE_RENAMED, handler = on_move },
+    -- })
+
+    local static_opts = {
+      buffers = {
+        follow_current_file = { enabled = true },
       },
-    },
-  },
+      window = {
+        mappings = {
+          ['Z'] = 'expand_all_nodes',
+        },
+      },
+    }
+    vim.tbl_deep_extend('force', static_opts, opts)
+  end,
 }

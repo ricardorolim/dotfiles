@@ -12,6 +12,20 @@ return {
       },
     },
   },
+  -- {
+  --   'alexpasmantier/pymple.nvim',
+  --   dependencies = {
+  --     'nvim-lua/plenary.nvim',
+  --     'MunifTanjim/nui.nvim',
+  --     -- optional (nicer ui)
+  --     'stevearc/dressing.nvim',
+  --     'nvim-tree/nvim-web-devicons',
+  --   },
+  --   build = ':PympleBuild',
+  --   config = function()
+  --     require('pymple').setup()
+  --   end,
+  -- },
   {
     -- Main LSP Configuration
     'neovim/nvim-lspconfig',
@@ -19,8 +33,8 @@ return {
       -- Automatically install LSPs and related tools to stdpath for Neovim
       -- Mason must be loaded before its dependents so we need to set it up here.
       -- NOTE: `opts = {}` is the same as calling `require('mason').setup({})`
-      { 'williamboman/mason.nvim', opts = {} },
-      'williamboman/mason-lspconfig.nvim',
+      { 'mason-org/mason.nvim', opts = {} },
+      'mason-org/mason-lspconfig.nvim',
       'WhoIsSethDaniel/mason-tool-installer.nvim',
 
       -- Useful status updates for LSP.
@@ -266,7 +280,49 @@ return {
             },
           },
         },
-        pyright = {},
+        basedpyright = {
+          settings = {
+            basedpyright = {
+              analysis = {
+                useLibraryCodeForTypes = true,
+                typeCheckingMode = 'basic',
+              },
+            },
+          },
+        },
+        -- pyright = {},
+        -- basedpyright = {},
+        -- pylsp = {
+        --   settings = {
+        --     pylsp = {
+        --       plugins = {
+        --         autoimport = { enabled = true },
+        --         rope_autoimport = { enabled = true },
+        --         rope_completion = { enabled = true },
+        --         pylint = { enabled = false },
+        --         pyflakes = { enabled = false },
+        --         mccabe = { enabled = false },
+        --         yapf = { enabled = false },
+        --       },
+        --     },
+        --   },
+        -- },
+        ruff = {
+          settings = {
+            -- Equivalent of passing CLI flags, e.g. `ruff check --extend-ignore F821`
+            -- args = { '--extend-ignore', 'F821' }, -- disable undefined name errors
+          },
+          -- pyright = {
+          --   -- Using Ruff's import organizer
+          --   disableOrganizeImports = true,
+          -- },
+          python = {
+            analysis = {
+              -- Ignore all files for analysis to exclusively use Ruff for linting
+              ignore = { '*' },
+            },
+          },
+        },
         rust_analyzer = {},
         jdtls = {},
         ts_ls = {},
@@ -332,19 +388,34 @@ return {
         vim.lsp.config(name, server)
       end
 
+      -- require('mason-lspconfig').setup {
+      --   ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
+      --   automatic_installation = false,
+      --   -- handlers = {
+      --   --   function(server_name)
+      --   --     local server = servers[server_name] or {}
+      --   --     -- This handles overriding only values explicitly passed
+      --   --     -- by the server configuration above. Useful when disabling
+      --   --     -- certain features of an LSP (for example, turning off formatting for ts_ls)
+      --   --     server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+      --   --     require('lspconfig')[server_name].setup(server)
+      --   --   end,
+      --   -- },
+      -- }
+
       require('mason-lspconfig').setup {
         ensure_installed = {}, -- explicitly set to an empty table (Kickstart populates installs via mason-tool-installer)
         automatic_installation = false,
-        -- handlers = {
-        --   function(server_name)
-        --     local server = servers[server_name] or {}
-        --     -- This handles overriding only values explicitly passed
-        --     -- by the server configuration above. Useful when disabling
-        --     -- certain features of an LSP (for example, turning off formatting for ts_ls)
-        --     server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
-        --     require('lspconfig')[server_name].setup(server)
-        --   end,
-        -- },
+        handlers = {
+          function(server_name)
+            local server = servers[server_name] or {}
+            -- This handles overriding only values explicitly passed
+            -- by the server configuration above. Useful when disabling
+            -- certain features of an LSP (for example, turning off formatting for ts_ls)
+            server.capabilities = vim.tbl_deep_extend('force', {}, capabilities, server.capabilities or {})
+            require('lspconfig')[server_name].setup(server)
+          end,
+        },
       }
     end,
   },

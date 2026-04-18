@@ -5,6 +5,7 @@
 return {
   {
     'lewis6991/gitsigns.nvim',
+    dependencies = 'nvim-treesitter/nvim-treesitter-textobjects',
     opts = {
       on_attach = function(bufnr)
         local gitsigns = require 'gitsigns'
@@ -15,30 +16,21 @@ return {
           vim.keymap.set(mode, l, r, opts)
         end
 
-        local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
+        -- local ts_repeat_move = require 'nvim-treesitter.textobjects.repeatable_move'
+        -- local ts_repeat_move = require('nvim-treesitter-textobjects').textobjects.repeatable_move
 
-        local next_hunk = function()
-          if vim.wo.diff then
-            vim.cmd.normal { ']c', bang = true }
-          else
-            gitsigns.nav_hunk 'next'
-          end
-        end
-
-        local prev_hunk = function()
-          if vim.wo.diff then
-            vim.cmd.normal { '[c', bang = true }
-          else
-            gitsigns.nav_hunk 'prev'
-          end
-        end
-
-        local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(next_hunk, prev_hunk)
+        -- local next_hunk_repeat, prev_hunk_repeat = ts_repeat_move.make_repeatable_move_pair(next_hunk, prev_hunk)
 
         -- Navigation
-        map('n', ']c', next_hunk_repeat, { desc = 'Jump to next git [c]hange' })
-        map('n', '[c', prev_hunk_repeat, { desc = 'Jump to previous git [c]hange' })
+        -- map('n', ']c', next_hunk_repeat, { desc = 'Jump to next git [c]hange' })
+        -- map('n', '[c', prev_hunk_repeat, { desc = 'Jump to previous git [c]hange' })
+        --
 
+        -- Navigation
+        -- map('n', ']c', next_hunk)
+        -- map('n', '[c', prev_hunk)
+
+        -- example: make gitsigns.nvim movement repeatable with ; and , keys.
         -- Actions
         -- visual mode
         map('v', '<leader>hs', function()
@@ -64,5 +56,35 @@ return {
         map('n', '<leader>tD', gitsigns.preview_hunk_inline, { desc = '[T]oggle git show [D]eleted' })
       end,
     },
+  },
+  {
+    'kiyoon/repeatable-move.nvim',
+    dependencies = { 'nvim-treesitter/nvim-treesitter-textobjects' },
+    config = function()
+      local repeat_move = require 'repeatable_move'
+      local gs = require 'gitsigns'
+
+      local next_hunk = function()
+        if vim.wo.diff then
+          vim.cmd.normal { ']c', bang = true }
+        else
+          gs.nav_hunk 'next'
+        end
+      end
+
+      local prev_hunk = function()
+        if vim.wo.diff then
+          vim.cmd.normal { '[c', bang = true }
+        else
+          gs.nav_hunk 'prev'
+        end
+      end
+
+      -- make sure forward function comes first
+      local next_hunk_repeat, prev_hunk_repeat = repeat_move.make_repeatable_move_pair(next_hunk, prev_hunk)
+
+      vim.keymap.set({ 'n', 'x', 'o' }, ']c', next_hunk_repeat)
+      vim.keymap.set({ 'n', 'x', 'o' }, '[c', prev_hunk_repeat)
+    end,
   },
 }

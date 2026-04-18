@@ -12,7 +12,7 @@ return {
   ---@module "auto-session"
   ---@type AutoSession.Config
   opts = {
-    allowed_dirs = { '~/code/*', '~/simscale/*' },
+    allowed_dirs = { '~/code/*', '~/simscale/*', '~/simscale/ai/*' },
     bypass_save_filetypes = { 'alpha', 'dashboard' },
     git_use_branch_name = true,
   },
